@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OMDb</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    h1 { text-align: center; }
+    .search-container { text-align: center; margin-bottom: 20px; }
+    input[type="text"] { width: 60%; max-width: 400px; padding: 10px; font-size: 16px; border: 2px solid #333; border-radius: 5px; margin-right: 10px; }
+    button { padding: 10px 20px; font-size: 16px; background-color: #333; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+    button:hover { background-color: #555; }
+    #results { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+    .movie { background: #fff; margin: 10px; padding: 10px; border: 1px solid #ccc; width: 200px; text-align: center; cursor: pointer; transition: transform 0.2s; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
+    .movie:hover { transform: scale(1.05); background-color: #eee; }
+    img { width: 100%; border-radius: 5px; height: 300px; object-fit: cover; }
+    #details { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: 30px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none; text-align: left; clear: both; }
+    #details img { width: 200px; margin-bottom: 10px; float: right; margin-left: 20px; border-radius: 5px; }
+    #actor-info { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; clear: both; }
+    a.actor-link { cursor: pointer; color: #007BFF; text-decoration: underline; }
+    a.actor-link:hover { color: #0056b3; }
+    @media (max-width: 600px) {
+      input[type="text"] { width: 80%; margin-bottom: 10px; }
+      button { width: 80%; margin-bottom: 10px; }
+      .movie { width: 80%; }
+      #details img { float: none; display: block; margin: 0 auto 10px auto; width: 100%; height: auto; }
+      #details { text-align: center; }
+      #actor-info { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <h1>OMDb</h1>
+  <div class="search-container">
+    <input type="text" id="movieTitle" placeholder="Enter movie name" />
+    <button id="searchBtn">Search</button>
+    <button id="viewWatchlistBtn">View Watchlist</button>
+  </div>
+
+  <div id="results"></div>
+  <div id="details"></div>
+
+  <script>
+    const apiKey = '1e9af442';
+    const resultsDiv = document.getElementById('results');
+    const detailsDiv = document.getElementById('details');
+    const searchBtn = document.getElementById('searchBtn');
+    const movieInput = document.getElementById('movieTitle');
+    const viewWatchlistBtn = document.getElementById('viewWatchlistBtn');
+
+    function searchMovies(title = '') {
+      if (!title) title = movieInput.value.trim();
+      if (!title) return alert('Please enter a movie name.');
+
+      resultsDiv.style.display = 'flex';
+      detailsDiv.style.display = 'none';
+      resultsDiv.innerHTML = 'Loading...';
+
+      fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(title)}&apikey=${apiKey}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.Response === 'True' && data.Search) {
+            resultsDiv.innerHTML = '';
+            data.Search.forEach(movie => {
+              const div = document.createElement('div');
+              div.className = 'movie';
+              div.innerHTML = `
+                <h3>${movie.Title}</h3>
+                <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/200x300?text=No+Image'}" alt="Poster" />
+                <p>Year: ${movie.Year}</p>
+                <button class="watchlist-btn">Add to Watchlist</button>
+              `;
+              div.onclick = (e) => {
+                if (e.target.classList.contains('watchlist-btn')) {
+                  e.stopPropagation();
+                  addToWatchlist(movie);
+                } else {
+                  fetchMovieDetails(movie.imdbID);
+                }
+              };
+              resultsDiv.appendChild(div);
+            });
+          } else {
+            resultsDiv.innerHTML = `<p>No movies found for "${title}".</p>`;
+          }
+        })
+        .catch(err => {
+          resultsDiv.innerHTML = `<p>Error fetching data.</p>`;
+          console.error(err);
+        });
+    }
+
+    function fetchMovieDetails(imdbID) {
+      resultsDiv.style.display = 'none';
+      detailsDiv.style.display = 'block';
+      detailsDiv.innerHTML = 'Loading details...';
+
+      fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${apiKey}&plot=full`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.Response === 'True') {
+            const actorsList = data.Actors.split(',').map(actor => actor.trim());
+            const actorsHTML = actorsList.map(actor => `<a href="#" class="actor-link">${actor}</a>`).join(', ');
+            detailsDiv.innerHTML = `
+              <h2>${data.Title} (${data.Year})</h2>
+              <img src="${data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/200x300?text=No+Image'}" alt="Poster" />
+              <p><strong>Genre:</strong> ${data.Genre}</p>
+              <p><strong>Director:</strong> ${data.Director}</p>
+              <p><strong>Actors:</strong> ${actorsHTML}</p>
+              <p><strong>Plot:</strong> ${data.Plot}</p>
+              <p><strong>IMDB Rating:</strong> ${data.imdbRating}</p>
+              <p><strong>Runtime:</strong> ${data.Runtime}</p>
+              <p><strong>Language:</strong> ${data.Language}</p>
+              <div id="actor-info"></div>
+            `;
+            document.querySelectorAll('.actor-link').forEach(link => {
+              link.addEventListener('click', e => {
+                e.preventDefault();
+                const actorName = e.target.textContent;
+                fetchActorInfo(actorName);
+              });
+            });
+          } else {
+            detailsDiv.innerHTML = `<p>Details not found.</p>`;
+          }
+        })
+        .catch(err => {
+          detailsDiv.innerHTML = `<p>Error fetching details.</p>`;
+          console.error(err);
+        });
+    }
+
+    function fetchActorInfo(name) {
+      const actorInfoDiv = document.getElementById('actor-info');
+      actorInfoDiv.innerHTML = `Loading info about <strong>${name}</strong>...`;
+      fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.extract) {
+            actorInfoDiv.innerHTML = `
+              <h3>${data.title}</h3>
+              ${data.thumbnail ? `<img src="${data.thumbnail.source}" alt="${data.title}" style="max-width:150px; float:right; margin-left:10px; border-radius:5px;">` : ''}
+              <p>${data.extract}</p>
+              <p><a href="${data.content_urls.desktop.page}" target="_blank" rel="noopener noreferrer">Read more on Wikipedia</a></p>
+            `;
+          } else {
+            actorInfoDiv.innerHTML = `<p>No info found for <strong>${name}</strong>.</p>`;
+          }
+        })
+        .catch(() => {
+          actorInfoDiv.innerHTML = `<p>Error fetching info for <strong>${name}</strong>.</p>`;
+        });
+    }
+
+    function addToWatchlist(movie) {
+      const list = JSON.parse(localStorage.getItem('watchlist') || '[]');
+      if (!list.find(m => m.imdbID === movie.imdbID)) {
+        list.push(movie);
+        localStorage.setItem('watchlist', JSON.stringify(list));
+        alert(`${movie.Title} added to your watchlist!`);
+      } else {
+        alert(`${movie.Title} is already in your watchlist.`);
+      }
+    }
+
+    viewWatchlistBtn.onclick = () => {
+      detailsDiv.style.display = 'none';
+      resultsDiv.style.display = 'flex';
+      resultsDiv.innerHTML = '';
+      const list = JSON.parse(localStorage.getItem('watchlist') || '[]');
+      if (list.length === 0) {
+        resultsDiv.innerHTML = '<p>Your watchlist is empty.</p>';
+        return;
+      }
+      list.forEach(movie => {
+        const div = document.createElement('div');
+        div.className = 'movie';
+        div.innerHTML = `
+          <h3>${movie.Title}</h3>
+          <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/200x300?text=No+Image'}" alt="Poster" />
+          <p>Year: ${movie.Year}</p>
+          <button class="remove-watchlist-btn">Remove</button>
+        `;
+        div.onclick = (e) => {
+          if (e.target.classList.contains('remove-watchlist-btn')) {
+            e.stopPropagation();
+            removeFromWatchlist(movie.imdbID);
+          } else {
+            fetchMovieDetails(movie.imdbID);
+          }
+        };
+        resultsDiv.appendChild(div);
+      });
+    };
+
+    function removeFromWatchlist(imdbID) {
+      let list = JSON.parse(localStorage.getItem('watchlist') || '[]');
+      list = list.filter(m => m.imdbID !== imdbID);
+      localStorage.setItem('watchlist', JSON.stringify(list));
+      alert('Removed from watchlist.');
+      viewWatchlistBtn.onclick();
+    }
+
+    searchBtn.onclick = () => searchMovies();
+    movieInput.addEventListener('keydown', e => { if (e.key === 'Enter') searchMovies(); });
+  </script>
+</body>
+</html>
