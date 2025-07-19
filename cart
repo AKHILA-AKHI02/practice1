@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shopping Cart</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h2>Your Shopping Cart</h2>
+  <table id="cartTable">
+    <thead>
+      <tr>
+        <th>Item Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Cart items will be inserted here -->
+    </tbody>
+  </table>
+  <div class="empty-message" id="emptyMessage" style="display:none;">Your cart is empty.</div>
+  <div id="totalAmount">Total Amount: $0.00</div>
+
+  <div class="payment-section" id="paymentSection" style="display:none;">
+    <h3>Payment Options</h3>
+    <label for="paymentMethod">Select Payment Method:</label>
+    <select id="paymentMethod">
+      <option value="online_payment">Online Payment</option>
+      <option value="cod">Cash on Delivery</option>
+    </select>
+    <button class="pay-btn" id="payNowBtn">Pay Now</button>
+  </div>
+
+  <script>
+    // Cart management using localStorage
+    const cartKey = 'shoppingCart';
+
+    function getCart() {
+      const cart = localStorage.getItem(cartKey);
+      return cart ? JSON.parse(cart) : [];
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+    }
+
+    function getCartTotal() {
+      const cart = getCart();
+      return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    }
+
+    function renderCart() {
+      const cart = getCart();
+      const tbody = document.querySelector('#cartTable tbody');
+      const emptyMessage = document.getElementById('emptyMessage');
+      const paymentSection = document.getElementById('paymentSection');
+      const totalAmountDiv = document.getElementById('totalAmount');
+      tbody.innerHTML = '';
+
+      if (cart.length === 0) {
+        emptyMessage.style.display = 'block';
+        paymentSection.style.display = 'none';
+        totalAmountDiv.textContent = 'Total Amount: $0.00';
+        return;
+      } else {
+        emptyMessage.style.display = 'none';
+        paymentSection.style.display = 'block';
+      }
+
+      cart.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.description}</td>
+          <td class="price">Rs ${item.price.toFixed(2)}</td>
+          <td><input type="number" min="1" value="${item.quantity}" data-index="${index}" class="qty-input" /></td>
+          <td><button class="remove-btn" data-index="${index}">Remove</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      totalAmountDiv.textContent = 'Total Amount: Rs ' + getCartTotal().toFixed(2);
+
+      // Add event listeners for quantity change and remove buttons
+      document.querySelectorAll('.qty-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const idx = e.target.getAttribute('data-index');
+          let val = parseInt(e.target.value);
+          if (isNaN(val) || val < 1) val = 1;
+          const cart = getCart();
+          cart[idx].quantity = val;
+          saveCart(cart);
+          renderCart();
+        });
+      });
+
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = e.target.getAttribute('data-index');
+          const cart = getCart();
+          cart.splice(idx, 1);
+          saveCart(cart);
+          renderCart();
+        });
+      });
+    }
+
+    document.getElementById('payNowBtn').addEventListener('click', () => {
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      if (paymentMethod === 'online_payment') {
+        // Navigate to new payment page
+        window.location.href = 'payment.html';
+      } else if (paymentMethod === 'cod') {
+        alert('Order placed successfully with Cash on Delivery.');
+        // Clear cart after order
+        localStorage.removeItem('shoppingCart');
+        renderCart();
+      } else {
+        alert('Please select a valid payment method.');
+      }
+    });
+
+    // On page load
+    renderCart();
+  </script>
+</body>
+</html>
