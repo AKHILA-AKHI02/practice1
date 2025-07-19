@@ -1,0 +1,267 @@
+/* Common styles for user pages */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: #f9f9f9;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  color: #333;
+}
+
+h1, h2, h3 {
+  color: #007bff;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+}
+
+.price {
+  font-weight: bold;
+  color: #007bff;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  filter: brightness(0.9);
+  transform: scale(1.05);
+}
+
+.remove-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.remove-btn:hover {
+  background-color: #c82333;
+}
+
+.pay-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.pay-btn:hover {
+  background-color: #218838;
+}
+
+.empty-message {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 2rem;
+}
+
+.payment-section {
+  margin-top: 2rem;
+  border-top: 1px solid #ccc;
+  padding-top: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+select, input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#totalAmount, #totalCost {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #007bff;
+  text-align: right;
+  margin-top: 1rem;
+}
+
+#qrCode {
+  margin: 1rem auto;
+  width: 300px;
+  height: 300px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#scannerMessage {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #555;
+}
+
+#backToCartBtn {
+  margin-top: 2rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#backToCartBtn:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.buy-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.buy-btn:hover {
+  background-color: #218838;
+  box-shadow: 0 0 8px rgba(33, 136, 56, 0.7);
+  transform: scale(1.05);
+}
+
+.cart-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.cart-btn:hover {
+  background-color: #0056b3;
+  box-shadow: 0 0 8px rgba(0, 86, 179, 0.7);
+  transform: scale(1.05);
+}
+
+.mens-wear .item {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: white;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.mens-wear .item:hover {
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  transform: translateY(-5px);
+}
+
+.mens-wear .item h3,
+.mens-wear .item p,
+.mens-wear .item .price {
+  color: white;
+}
+
+.mens-wear .item img {
+  width: 100%;
+  max-width: 300px;
+  height: 200px;
+  border-radius: 6px;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Womens wear item styling */
+.womens-wear .item {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: white;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.womens-wear .item:hover {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+  transform: translateY(-8px);
+}
+
+.womens-wear .item h3,
+.womens-wear .item p,
+.womens-wear .item .price {
+  color: #333;
+  font-weight: 600;
+}
+
+.womens-wear .item img {
+  width: 100%;
+  max-width: 330px;
+  height: 200px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-bottom: 0.75rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Background video overlay for better text contrast */
+#background-video::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3);
+  pointer-events: none;
+  z-index: 0;
+}
