@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header .title {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    header nav button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    header nav button:hover {
+      background-color: #c82333;
+    }
+    main {
+      margin-top: 2rem;
+    }
+    .profile-info {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .profile-info h2 {
+      margin-top: 0;
+    }
+    .profile-info p {
+      font-size: 1.1rem;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">User Profile</div>
+    <nav>
+      <button id="logoutBtn">Logout</button>
+    </nav>
+  </header>
+  <main>
+    <div class="profile-info" id="profileInfo">
+      <h2>Loading user info...</h2>
+    </div>
+  </main>
+
+  <!-- Firebase App and Auth SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBiGco-t0d1Iej2yaVKYMU_73hBcWBILrE",
+      authDomain: "game-c8057.firebaseapp.com",
+      databaseURL: "https://game-c8057-default-rtdb.firebaseio.com",
+      projectId: "game-c8057",
+      storageBucket: "game-c8057.firebasestorage.app",
+      messagingSenderId: "482964467564",
+      appId: "1:482964467564:web:0cd8925807fe3ac5200d49",
+      measurementId: "G-Z0RZCLXSR6"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = 'login.html';
+      } else {
+        const profileDiv = document.getElementById('profileInfo');
+        profileDiv.innerHTML = `
+          <h2>Hello, ${user.displayName || user.email}</h2>
+          <p><strong>Email:</strong> ${user.email}</p>
+          <p><strong>User ID:</strong> ${user.uid}</p>
+        `;
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = 'login.html';
+      });
+    });
+  </script>
+</body>
+</html>
