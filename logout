@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Logout</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #logoutBtn {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #logoutBtn:hover {
+      background-color: #c82333;
+    }
+    #message {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #333;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <button id="logoutBtn">Logout</button>
+  <div id="message"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBiGco-t0d1Iej2yaVKYMU_73hBcWBILrE",
+      authDomain: "game-c8057.firebaseapp.com",
+      databaseURL: "https://game-c8057-default-rtdb.firebaseio.com",
+      projectId: "game-c8057",
+      storageBucket: "game-c8057.firebasestorage.app",
+      messagingSenderId: "482964467564",
+      appId: "1:482964467564:web:0cd8925807fe3ac5200d49",
+      measurementId: "G-Z0RZCLXSR6"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    const messageDiv = document.getElementById('message');
+
+      logoutBtn.addEventListener('click', () => {
+        console.log('Logout button clicked');
+        const user = auth.currentUser;
+        console.log('Current user:', user);
+        if (user) {
+          const uid = user.uid;
+          messageDiv.textContent = 'Deleting your data...';
+          console.log('Deleting data for user:', uid);
+
+          // Delete user data from /users/{uid}
+          database.ref('users/' + uid).remove()
+            .then(() => {
+              messageDiv.textContent = 'Data deleted. Logging out...';
+              console.log('Data deleted, signing out');
+              return auth.signOut();
+            })
+            .then(() => {
+              messageDiv.textContent = 'Logged out successfully. Redirecting...';
+              console.log('Signed out, redirecting to login.html');
+              setTimeout(() => {
+                window.location.href = 'login.html';
+              }, 1500);
+            })
+            .catch((error) => {
+              messageDiv.textContent = 'Error: ' + error.message;
+              console.error('Error during logout:', error);
+            });
+        } else {
+          messageDiv.textContent = 'No user is currently logged in.';
+          console.log('No user logged in, redirecting to login.html');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+        }
+      });
+  </script>
+</body>
+</html>
