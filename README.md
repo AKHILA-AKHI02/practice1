@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      z-index: 0;
+    }
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background-color: #f4f4f4;
+      background-size: cover;
+      background-position: 50% 50%;
+      z-index: -1;
+    }
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+      position: relative;
+      z-index: 1;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.5rem 0 1rem 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      width: 100%;
+      padding: 0.7rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .error-message {
+      color: red;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .success-message {
+      color: green;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .redirect-text {
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .redirect-text button {
+      width: auto;
+      padding: 0.7rem 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-left: 0.25rem;
+      text-decoration: none;
+      vertical-align: baseline;
+    }
+    .redirect-text button:hover {
+      background-color: #0056b3;
+      color: white;
+      text-decoration: none;
+    }
+    #login-btn {
+      display: block;
+      margin: 1rem auto 0 auto;
+      width: 100%;
+      max-width: 300px;
+      padding: 0.7rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    #login-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="login-container">
+    <h2>User Login</h2>
+    <div id="error-message" class="error-message"></div>
+    <div id="success-message" class="success-message"></div>
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button id="login-btn">Log In</button>
+    <p class="redirect-text">
+      If you don't have an account then
+      <button id="signupRedirectBtn" type="button" class="inline-signup-btn">Signup</button>
+    </p>
+
+    <!-- ✅ Added Watches and Shoes buttons -->
+    <!-- Explore buttons removed as per user request -->
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBiGco-t0d1Iej2yaVKYMU_73hBcWBILrE",
+      authDomain: "game-c8057.firebaseapp.com",
+      databaseURL: "https://game-c8057-default-rtdb.firebaseio.com",
+      projectId: "game-c8057",
+      storageBucket: "game-c8057.firebasestorage.app",
+      messagingSenderId: "482964467564",
+      appId: "1:482964467564:web:0cd8925807fe3ac5200d49",
+      measurementId: "G-Z0RZCLXSR6"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    tsParticles.load('particles-js', {
+      fpsLimit: 60,
+      background: {
+        color: "#f4f4f4"
+      },
+      particles: {
+        number: {
+          value: 80,
+          density: {
+            enable: true,
+            area: 800
+          }
+        },
+        color: {
+          value: "#007bff"
+        },
+        shape: {
+          type: "circle"
+        },
+        opacity: {
+          value: 0.5,
+          random: false,
+          anim: {
+            enable: false
+          }
+        },
+        size: {
+          value: 3,
+          random: true,
+          anim: {
+            enable: false
+          }
+        },
+        links: {
+          enable: true,
+          distance: 150,
+          color: "#007bff",
+          opacity: 0.4,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 2,
+          direction: "none",
+          random: false,
+          straight: false,
+          outModes: {
+            default: "bounce"
+          },
+          attract: {
+            enable: false
+          }
+        }
+      },
+      interactivity: {
+        events: {
+          onHover: {
+            enable: true,
+            mode: "grab"
+          },
+          onClick: {
+            enable: true,
+            mode: "push"
+          },
+          resize: true
+        },
+        modes: {
+          grab: {
+            distance: 140,
+            links: {
+              opacity: 1
+            }
+          },
+          push: {
+            quantity: 4
+          }
+        }
+      },
+      detectRetina: true
+    });
+
+    const loginBtn = document.getElementById('login-btn');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('error-message');
+    const successMessage = document.getElementById('success-message');
+    const signupRedirectBtn = document.getElementById('signupRedirectBtn');
+
+    loginBtn.addEventListener('click', () => {
+      errorMessage.textContent = '';
+      successMessage.textContent = '';
+      const email = emailInput.value;
+      const password = passwordInput.value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          successMessage.textContent = 'Login successful!';
+          emailInput.value = '';
+          passwordInput.value = '';
+          window.location.href = 'home.html';
+        })
+        .catch((error) => {
+          errorMessage.textContent = error.message;
+        });
+    });
+
+    signupRedirectBtn.addEventListener('click', () => {
+      window.location.href = 'signup.html';
+    });
+
+    // Explore buttons event listeners removed as per user request
+  </script>
+</body>
+</html>
