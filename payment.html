@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #007bff;
+      margin-bottom: 1rem;
+    }
+    #upiNumber {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 1rem 0;
+      padding: 0.5rem;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      user-select: all;
+    }
+    #qrCode {
+      margin: 1rem auto;
+      width: 300px;
+      height: 300px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    #scannerMessage {
+      margin-top: 1rem;
+      font-style: italic;
+      color: #555;
+    }
+    button {
+      margin-top: 2rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Complete Your Payment</h1>
+  <p>Please scan the QR code below with your UPI app to complete the payment.</p>
+  <div id="qrCode"></div>
+  <div id="upiNumber">UPI ID: </div>
+  <div id="totalCost" style="font-weight:bold; font-size:1.2rem; margin-top:1rem; color:#007bff;"></div>
+  <div id="scannerMessage"></div>
+  <button id="backToCartBtn">Back to Cart</button>
+
+  <script>
+    function loadAdminSettings() {
+      const upiId = localStorage.getItem('adminUpiId') || 'example@upi';
+      const qrUrl = localStorage.getItem('adminQrUrl') || '';
+      return { upiId, qrUrl };
+    }
+
+    function getCartTotal() {
+      const cart = localStorage.getItem('shoppingCart');
+      if (!cart) return 0;
+      const items = JSON.parse(cart);
+      return items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+    }
+
+    function updatePaymentInfo() {
+      const { upiId, qrUrl } = loadAdminSettings();
+      const amount = getCartTotal();
+      document.getElementById('upiNumber').textContent = `UPI ID: ${upiId}`;
+      document.getElementById('totalCost').textContent = `Total Amount: Rs ${amount}`;
+      let qrCodeUrl = qrUrl;
+      if (!qrCodeUrl) {
+        // Generate default QR code with amount
+        const upiData = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=ZUDIO&am=${amount}&cu=INR`;
+        qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiData)}`;
+      }
+      document.getElementById('qrCode').style.backgroundImage = `url('${qrCodeUrl}')`;
+    }
+
+    document.getElementById('backToCartBtn').addEventListener('click', () => {
+      window.location.href = 'cart.html';
+    });
+
+    updatePaymentInfo();
+  </script>
+</body>
+</html>
